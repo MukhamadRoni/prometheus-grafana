@@ -1,0 +1,35 @@
+# ==============================================
+# Blackbox Exporter Configuration
+# ==============================================
+
+modules:
+  # ------------------------------------------
+  # Modul TCP Connect - Cek port UP/DOWN
+  # ------------------------------------------
+  tcp_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4
+
+  # ------------------------------------------
+  # Modul HTTP GET - (Opsional, untuk cek endpoint web)
+  # ------------------------------------------
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200]
+      follow_redirects: true
+
+  # ------------------------------------------
+  # Modul ICMP Ping - (Opsional, untuk cek apakah host hidup)
+  # ------------------------------------------
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4

@@ -1,0 +1,5 @@
+# Environment (berisi kredensial)
+.env
+
+# Data volumes (jika di-mount lokal)
+data/

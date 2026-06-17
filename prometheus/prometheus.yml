@@ -1,0 +1,56 @@
+# ==============================================
+# Prometheus Configuration
+# ==============================================
+
+global:
+  scrape_interval: 15s        # Interval scraping default
+  evaluation_interval: 15s    # Interval evaluasi rules
+  scrape_timeout: 10s         # Timeout per scrape
+
+# ==============================================
+# Scrape Jobs
+# ==============================================
+scrape_configs:
+
+  # ------------------------------------------
+  # Job 1: Prometheus Self-Monitoring
+  # ------------------------------------------
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # ------------------------------------------
+  # Job 2: Node Exporter - Metrik Server
+  # (CPU, RAM, Disk, Network, dll.)
+  # ------------------------------------------
+  - job_name: "node_exporter"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["node_exporter:9100"]
+        labels:
+          instance_name: "server-utama"
+
+  # ------------------------------------------
+  # Job 3: Blackbox Exporter - TCP Port Probing
+  # Mengecek status UP/DOWN port aplikasi web
+  # ------------------------------------------
+  - job_name: "blackbox_tcp"
+    metrics_path: /probe
+    params:
+      module: [tcp_connect]
+    static_configs:
+      - targets:
+          - 103.253.244.101:8081   # Aplikasi Web - Port 8081
+          - 103.253.244.101:8082   # Aplikasi Web - Port 8082
+        labels:
+          group: "aplikasi-web"
+    relabel_configs:
+      # Simpan target asli sebagai parameter __param_target
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Simpan target asli sebagai label 'instance' di metrik
+      - source_labels: [__param_target]
+        target_label: instance
+      # Arahkan scrape ke Blackbox Exporter
+      - target_label: __address__
+        replacement: blackbox_exporter:9115
